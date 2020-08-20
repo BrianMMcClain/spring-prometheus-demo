@@ -4,17 +4,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+import io.micrometer.core.instrument.MeterRegistry;
 
 @RestController
 public class WebController {
 
-    SimpleMeterRegistry simpleReg = new SimpleMeterRegistry();
-    private final Counter visitCounter = Counter
-        .builder("demoVisitCounter")
-        .description("Number of hits to the / endpoint")
-        .tags("dev", "traffic")
-        .register(simpleReg);
+    Counter visitCounter;
+
+    public WebController(MeterRegistry registry) {
+        visitCounter = Counter.builder("visit_counter")
+            .description("Number of visits to the site")
+            .register(registry);
+    }
 
     @GetMapping("/")
     public String index() {
